@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link href="${resSys}/front.css" rel="stylesheet" type="text/css"/>
+<link href="${resSys}/jqueryUI/jquery.ui.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="/${res}/css/index.css" />
+<script type="text/javascript" src="${base}/res/jqueryUI/jquery.js"></script>
+<script src="${base}/res/common/js/jquery.ui.widget.js" type="text/javascript"></script>
+<script src="${base}/res/common/js/jquery.iframe-transport.js" type="text/javascript"></script>
+<script src="${base}/res/common/js/jquery.fileupload.js" type="text/javascript"></script>
+</head>
+<body>		
+	  <!-- 字段类型
+	  dataType:1 字符串文本  2 整形文本 3 浮点形文本
+      4 文本区 5 日期 6 下拉列表 7 复选框
+      8 单选框 9 附件 10 图片 11 电话 12 邮箱
+    --> 
+  <section class="message_w860">
+<h1>${form.name!}</h1>	
+  <form id="form" action="${base}/record_save.jspx" method="post">
+    <div class="message_inf"> 
+      <div class="line"></div>
+		[#if form??&&form.fileds??]	
+					<input type="hidden" name="formId" value="${form.id!}"/>
+					<input type="hidden" name="status" value="0"/>
+					<input type="hidden" name="appId" value="1580387213331704"/>
+				<!-- 	<input type="hidden" name="sessionKey" value="${sessionKey!}"/> -->
+       [#list form.fileds?sort_by("priority") as f]
+       <p>
+         [#if f.dataType==1]  <!-- 文本 --> 
+          
+					<span>${f.label!}:</span><input name="attr_${f.field!}" type="text" value="${f.defValue!}" class="message_title"/>				
+				 [/#if]	
+				 [#if f.dataType==2] <!-- 整形文本 --> 
+					<span>${f.label!}:</span><input name="attr_${f.field!}" type="number" value="${f.defValue!}" class="message_title"/> 
+				 [/#if]	
+				 [#if f.dataType==3] <!-- 浮点文本 --> 
+					<span>${f.label!}:</span><input name="attr_${f.field!}" type="number" value="${f.defValue!}" class="message_title"/>
+				 [/#if]	
+				 [#if f.dataType==4] <!-- 文本域 --> 
+					<span>${f.label!}:</span><textarea name="attr_${f.field!}" cols="30" rows="3" class="message_txt" >${f.defValue!}</textarea> 
+				 [/#if]	 
+				 [#if f.dataType==5] <!-- 时间选择 --> 
+					<span>${f.label!}:</span><input name="attr_${f.field!}" type="date" value="${f.defValue!}" /> 
+				 [/#if]	
+				 [#if f.dataType==6] <!-- 下拉 --> 
+					<span>${f.label!}:</span><select name="attr_${f.field!}" value="${f.defValue!}">
+						[#if f.optValue??]
+							[#list f.optValue?split(",") as opt]
+								<option [#if f.defValue==opt] selected="selected" [/#if]value="${opt}">${opt}</option>
+							[/#list]
+						[/#if]
+					</select> 
+				 [/#if]	
+				 [#if f.dataType==7]  <!-- 复选框 --> 
+					<span>${f.label!}:</span>
+						[#if f.optValue??]
+							[#list f.optValue?split(",") as opt]
+								<input name="attr_${f.field!}"
+									[#if f.defValue??]
+											[#list f.defValue?split(",") as def]	
+												[#if def==opt]
+													checked="checked"
+												[/#if]
+											[/#list]
+									[/#if]
+								value="${opt}"  type="checkbox"/> ${opt}
+							[/#list]
+						[/#if]
+				 [/#if]	
+				 [#if f.dataType==8] <!-- 单选框 --> 
+					<span>${f.label!}:</span>
+						[#if f.optValue??]
+							[#list f.optValue?split(",") as opt]
+								<input type="radio" name="attr_${f.field!}" value="${opt}" [#if f.defValue==opt] checked="checked" [/#if]/> ${opt}
+							[/#list]
+						[/#if]
+				[/#if]		
+				
+				[#if f.dataType==9] <!-- 附件 --> 
+					<span>${f.label!}:</span>
+					<input type="button" style="width:40px;height:24px;cursor:pointer;background:#3694d7;color:#fff;font-size:12px;cursor:pointer;" id="fileupload" value="上传"/>		
+					<input id="docfileupload" style='display:none' type="file" name="Filedata" data-url="../member/o_swfAttachsUpload.jspx" multiple>			
+					<input id="attachmentPaths" name="attr_${f.field!}" readonly="true" value="${f.defValue!}"/>
+					
+					<script>		
+					$(function () {
+						$('#fileupload').click(function(){						
+							$('#docfileupload').trigger('click');
+						})
+										
+						$('#docfileupload').fileupload({
+					        dataType: 'json',
+					        add: function (e, data) {
+					            data.submit();				         
+					        },
+					        done: function (e, data) {	
+					        	if(data.result.error!=undefined){
+					        		alert(data.result.error)
+					        	}	  
+						   		$("#attachmentPaths").val(data.result.attachUrl);	           					           
+					       	 },
+							progressall: function (e, data) {
+								$("#submit").prop("disabled","disabled");
+							}
+					    });
+					});
+					</script>		
+				[/#if]	
+				
+				[#if f.dataType==10] <!-- 图片 --> 
+					<span>${f.label!}:</span>
+					<input type="button" style="width:40px;height:24px;cursor:pointer;background:#3694d7;color:#fff;font-size:12px;cursor:pointer;" id="fileupload1" value="上传"/>
+					<input id="docfileupload1" style='display:none' type="file" name="Filedata" data-url="../member/o_swfPicsUpload.jspx" multiple>			
+					<input id="uploadImgPath" name="attr_${f.field!}" readonly="true" value="${f.defValue!}"/>
+					<script>		
+					$(function () {
+						$('#fileupload1').click(function(){						
+							$('#docfileupload1').trigger('click');
+						})
+										
+						$('#docfileupload1').fileupload({
+					        dataType: 'json',
+					        add: function (e, data) {
+					            data.submit();				         
+					        },
+					        done: function (e, data) {	
+					        	if(data.result.error!=undefined){
+					        		alert(data.result.error)
+					        	}	        	
+								imgUrl=data.result.imgUrl;							
+								$("#uploadImgPath").val(imgUrl);							   									   		
+					       	 },
+							progressall: function (e, data) {
+								$("#submit").prop("disabled","disabled");
+							}
+					    });
+					});
+					</script>
+				[/#if]	
+				
+				[#if f.dataType==11] <!-- 电话 --> 
+					<span>${f.label!}:</span><input name="attr_${f.field!}" type="text" value="${f.defValue!}"/>					
+				[/#if]	
+				
+				[#if f.dataType==12] <!-- 邮箱 --> 
+					<span>${f.label!}:</span><input name="attr_${f.field!}" type="text" value="${f.defValue!}"/>					
+				[/#if]	
+		
+         <div>${f.description!}</div></br>
+        </p>
+			 [/#list]
+		[/#if]
+		验证码： 
+		<input type="text" name="captcha" maxlength="20" class="member-change"/> <img id="customCaptcha" src="${base}/captcha.svl" onclick="this.src='${base}/captcha.svl?d='+new Date()"/>
+		</br>
+		<input type="submit" id="submit" value="提交"/>
+    <button>重置</button>
+  </div>
+  </form>
+</section>
+	<script type="text/javascript">
+            $(function() {          	
+	        	$("#submit").click(function () {
+	                var options = {
+	                    url: '${base}/record_save.jspx',
+	                    type: 'post',
+	                    dataType: 'json',
+	                    data: $("#form").serialize(),
+	                    success:  function (data) {
+		                	if(data.status==0) {
+			                    alert("提交成功");                   
+			                }else if(data.status==1) {	
+			                    alert("验证码错误");
+			                    $("#customCaptcha").click();
+			                }else if(data.status==2) {	
+			                    alert("该站点不可用");
+			                    $("#customCaptcha").click();
+			                }else if(data.status==3) {	
+			                    alert("您需要登陆");
+			                    $("#customCaptcha").click();
+			                }else if(data.status==4) {	
+			                    alert("表单发起尚未开始");
+			                    $("#customCaptcha").click();
+			                }else if(data.status==5) {	
+			                    alert("表单发起已经结束");
+			                    $("#customCaptcha").click();
+			                }else if(data.status==6) {	
+			                    alert("您今日已超过提交上限");
+			                    $("#customCaptcha").click();
+			                }
+	                    }
+	                };
+	                $.ajax(options);
+	                return false;
+	            });
+            });
+	</script>
+</body>
+</html>
